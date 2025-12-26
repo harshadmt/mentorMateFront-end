@@ -28,15 +28,15 @@ const LoginPage = () => {
         { withCredentials: true }
       );
 
-      const { token, user } = response.data;
-      
-      // ✅ FIXED: Save auth token to localStorage AND Zustand store
-      if (token) {
-        setToken(token);  // This also saves to localStorage
-      }
-      
-      // Set user in store from login response
-      setUser(user);
+      // Accept common token shapes from backend
+      const token = response.data?.token || response.data?.data?.token || response.data?.accessToken || response.data?.access_token;
+      const user = response.data?.user || response.data?.data?.user || response.data?.userData;
+
+      // Save auth token to localStorage AND Zustand store (if present)
+      if (token) setToken(token);
+
+      // Set user in store from login response (if present)
+      if (user) setUser(user);
       
       // Fetch fresh user profile data to ensure we have complete data
       // Don't let fetchUser error break the login flow
@@ -56,8 +56,13 @@ const LoginPage = () => {
       }, 1500);
       
     } catch (err) {
-      const message = err.response?.data?.message || 'Login failed.';
+      console.error('Login error:', err);
+      const status = err.response?.status;
+      const serverMsg = err.response?.data || err.message;
+      const message = (err.response?.data?.message) || `Login failed${status ? ' (' + status + ')' : ''}`;
       toast.error(message, { position: 'top-right' });
+      // Helpful console output for debugging
+      console.debug('Login error details:', { status, serverMsg });
     } finally {
       setIsLoading(false);
     }

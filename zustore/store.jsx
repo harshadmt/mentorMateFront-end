@@ -16,6 +16,11 @@ const useUserStore = create(
         if (authToken) {
           localStorage.setItem('authToken', authToken);
         }
+        // Also attach to axios defaults so immediate requests include it
+        try {
+          if (authToken) api.defaults.headers.common.Authorization = `Bearer ${authToken}`;
+          else delete api.defaults.headers.common.Authorization;
+        } catch (e) {}
         set({ token: authToken });
       },
 
@@ -34,11 +39,13 @@ const useUserStore = create(
 
       logout: () => {
         localStorage.removeItem('authToken');
+        try { delete api.defaults.headers.common.Authorization; } catch (e) {}
         set({ user: null, token: null });
       },
 
       clearUser: () => {
         localStorage.removeItem('authToken');
+        try { delete api.defaults.headers.common.Authorization; } catch (e) {}
         set({ user: null, token: null });
       },
     }),
