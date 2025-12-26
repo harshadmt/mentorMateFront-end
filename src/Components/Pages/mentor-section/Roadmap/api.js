@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000', // ✅ FIXED: Use env variable
+  baseURL: import.meta.env.VITE_API_URL || 'https://mentormateback-end.onrender.com', // ✅ FIXED: Use env variable
 });
 
 // Add auth token to every request
